@@ -10,6 +10,8 @@ On peut trouver les fichiers de configuration de apache dans le dossier /etc/apa
 
 Pour le contenu de notre page HTML statique, nous avons choisi de partir avec le template Grayscale (https://startbootstrap.com/previews/grayscale) fourni par Start Bootstrap, que nous avons customisé.
 
+Nous avons également créé deux scripts, build.sh et run.sh qui nous permettent respectivement de build et de run notre image Docker php.
+
 ## 2. Serveur HTTP dynamique "dockerisé" avec express.js
 
 ## 3. Reverse proxy statique avec apache
