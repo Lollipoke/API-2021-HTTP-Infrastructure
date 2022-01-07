@@ -68,4 +68,6 @@ Nous avons ensuite modifié notre container apache_statique. Nous avons modifié
 
 Dans notre script pets.js, le premier dollar est une variable utilisée par JQuery. Cela signifie que quand JQuery a fini de charger, il faut exécuter cette fonction-là de call-back. Nous avons ensuite écrit la fonction loadPets qui s'occupe de récupérer depuis /api/pets/ la liste des animaux colorés, et qui change le texte et la couleur class "pets" en fonction du premier résultat obtenu, s'il y en a au moins un.
 
+Comme pour les étapes précédentes, nous avons ajouté nos modifications dans le dossier src local afin de pouvoir les copier directement lors de la création des containers, via l'instruction COPY du Dockerfile.
+
 ## 5. Reverse proxy dynamique
