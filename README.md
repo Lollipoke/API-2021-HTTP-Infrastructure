@@ -54,7 +54,9 @@ Dans un deuxième temps nous avons créé un dossier conf local sur notre machin
 
 Il est important de fournir un site par défaut, dans notre cas ici le site qui est décrit par le fichier 000-default.conf, afin de rerouter les demandes qui ne précisent pas de Host: vers ce dernier. Sinon les demandes sans Host: seraient aussi redirigées vers notre reverse-proxy, et ce n'est pas ce que l'on veut, cas on veut uniquement les demandes qui sont adressées au Host: labo.api.ch.
 
-Une fois qu'on a build et run notre image, on peut tester notre infrastructure avec telnet. Pour tester notre infrastructure, il faut faire en sorte que le navigateur envoie le bon Host dans sa requête, et pour cela il faut configurer le DNS. Pour Windows, il faut modifier le fichier host qui se trouve à C:\Windows\System32\drivers\etc\hosts
+Une fois qu'on a build et run notre image, on peut tester notre infrastructure avec telnet. Pour tester notre infrastructure dans un navigateur, il faut faire en sorte que le navigateur envoie le bon Host dans sa requête, et pour cela il faut configurer le DNS. Pour Windows, il faut modifier le fichier hosts qui se trouve à C:\Windows\System32\drivers\etc\hosts.
+
+De manière similaire aux étapes 1 et 2, nous avons également écrits deux scripts build et run, qui nous permettent respectivement de construire et lancer l'image Docker décrite plus haut.
 
 ## 4. Requêtes AJAX avec JQuery
 
