@@ -64,4 +64,8 @@ De manière similaire aux étapes 1 et 2, nous avons également écrits deux scr
 
 Pour faire nos requêtes AJAX, nous avons décidé d'utiliser la librairie Javascript JQuery. Depuis notre browser, on envoie des requêtes en arrière plan au serveur dynamique pour récupérer des données (des animaux colorés), et à partir de ces données on va modifier notre site web statique pour afficher le nom du premier animal dans la couleur correspondante.
 
+Nous avons ensuite modifié notre container apache_statique. Nous avons modifié index.html en ajoutant deux nouveaux scripte, un qui charge JQuery, et l'autrescript javascript, pets.js, qui s'occupe de charger nos paires d'animaux colorés.
+
+Dans notre script pets.js, le premier dollar est une variable utilisée par JQuery. Cela signifie que quand JQuery a fini de charger, il faut exécuter cette fonction-là de call-back. Nous avons ensuite écrit la fonction loadPets qui s'occupe de récupérer depuis /api/pets/ la liste des animaux colorés, et qui change le texte et la couleur class "pets" en fonction du premier résultat obtenu, s'il y en a au moins un.
+
 ## 5. Reverse proxy dynamique
