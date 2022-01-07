@@ -62,4 +62,6 @@ De manière similaire aux étapes 1 et 2, nous avons également écrits deux scr
 
 ## 4. Requêtes AJAX avec JQuery
 
+Pour faire nos requêtes AJAX, nous avons décidé d'utiliser la librairie Javascript JQuery. Depuis notre browser, on envoie des requêtes en arrière plan au serveur dynamique pour récupérer des données (des animaux colorés), et à partir de ces données on va modifier notre site web statique pour afficher le nom du premier animal dans la couleur correspondante.
+
 ## 5. Reverse proxy dynamique
