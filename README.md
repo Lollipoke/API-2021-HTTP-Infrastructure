@@ -58,6 +58,8 @@ Une fois qu'on a build et run notre image, on peut tester notre infrastructure a
 
 De manière similaire aux étapes 1 et 2, nous avons également écrits deux scripts build et run, qui nous permettent respectivement de construire et lancer l'image Docker décrite plus haut.
 
+/!\ Ce setup est très fragile car les adresses IP sont hardcodées dans le fichier de configuration, et il faut s'assurer de démarrer les containers dans le bon ordre, et qu'ils aient reçu la bonne adresse IP.
+
 ## 4. Requêtes AJAX avec JQuery
 
 ## 5. Reverse proxy dynamique
