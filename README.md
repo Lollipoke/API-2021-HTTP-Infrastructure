@@ -71,3 +71,25 @@ Dans notre script pets.js, le premier dollar est une variable utilisée par JQue
 Comme pour les étapes précédentes, nous avons ajouté nos modifications dans le dossier src local afin de pouvoir les copier directement lors de la création des containers, via l'instruction COPY du Dockerfile.
 
 ## 5. Reverse proxy dynamique
+
+Un des problèmes fondamentaux avec notre infrastructure telle que nous l'avons laissée à la fin de l'étape 4, est le fait que nous avons codé "en dur" les adresses IP dans le fichier de configuration de notre reverse proxy. Cette solution, bien que fonctionnelle sous certaines conditions, est non seulement peu élégante, mais surtout extrêmement fragile. En effet, elle implique de lancer les containers dans un ordre précis et nécessite de vérifier à la main que les adresses IP attribuées aux containers sont bien celles auxquelles on s'attend. Rien ne nous garantit qu'elles seront effectivement les bonnes !
+
+Le but de cette 5ème partie du laboratoire était donc de corriger ce problème en rendant la configuration de notre reverse proxy dynamique.
+
+Une des premières choses à savoir est qu'avec le flag -e, il est possible de démarrer un container en lui passant des variables d'environnement, que des scripts à l'intérieur du container en exécution pourront lire et utiliser. C'est donc un moyen de communiquer entre l'extérieur et l'intérieur du container.
+
+Une deuxième chose à noter est qu'il faut aller voir comment l'image php a été construite afin de pouvoir ajouter une étape dans la configuration, étape qui exécutera un script que nous auront écrit et qui permettra de définir les addresses ip des containers en cours d'exécution de manière dynamique, en lisant les variables d'environnement définie lors du lancement du container. Dans cette étape nous utiliserons php comme outil pour réaliser un script pour injecter les variables d'environnement dans un template et pour préparer notre fichier de configuration.
+
+En observant la structure du Dockerfile de l'image apache que nous avons choisie pour notre reverse proxy, nous remarquons que sa dernière instruction est le fait de run le script apache2-foreground. Ce que nous allons faire, c'est de remplacer ce script apache2-foreground par une nouvelle version où nous y ajoutons l'exécution de notre propre script. Nous avons copié le contenu du script original et avons simplement ajouté quelques lignes. **************
+Nous avons également modifié le Dockerfile afin de remplacer le fichier apache2-foreground par notre version modifiée dans /usr/local/bin/.
+
+Nous avons ensuite créé un dossier templates dans lequel nous avons ajouté un script php config-template.php. La fonction getenv("NAME") de php nous permet de récupérer la valeur de variables d'environnement, ce qui nous permet donc de récupérer nos deux adresses IP passées au moment de la création des containers à l'intérieur du script php. En reprenant le script 001-reverse-proxy.conf écrit dans l'étape 3 et en l'adaptant au php, on peut donc remplacer les adresses ip hardcodées par les valeur des variables d'environnement si souvent citées dans cette partie.
+
+Une fois cette étape réalisée, il a fallu à nouveau modifier le Dockerfile pour copier notre dossier templates dans /var/apache2/templates
+
+Ensuite nous avons modifié à nouveau notre script apache2-foreground adapté pour y ajouter la commande php qui permet d'exécuter notre script php qui se situe dans templates, et qui génère notre fichier de configuration 001-reverse-proxy.conf
+
+Nous avons rencontré quelques problèmes avec apache et les variables d'environnement, et c'est pour cela que nous avons ajouté dans Dockerfile la définition des variables d'environnements qui se trouvent dans le fichier etc/apache2/envvars. Pour que cela fonctionne on aurait également pu run la commande source etc/apache2/envvars.
+
+Une fois que nous avons fait tout cela, nous pouvons tester notre infrastructure dans sa totalité. Pour cela nous pouvons lancer plusieurs container api/apache_php, dont un que nous nommons apache_static, puis plusieurs container api/express_pets, dont un que nous nommons express_dynamic. A l'aide de la commande docker inspect XXX | grep -i ipaddress, nous récupérons les addresses de nos deux containers nommés (remplacer XXX par apache_static et express_dynamic). Ensuite, nous pouvons lancer un container api/apache_rp en n'oubliant pas de préciser les variables d'environnement initialisées avec les addresses IP qu'on a récupérées l'instant d'avant ni de mapper le port 8080 au port 80.
+Finalement, étant donné que notre fichier Hosts contient toujours la liaison labo.api.ch => localhost, on peut accéder directement à notre page web à l'adresse labo.api.ch:8080 et admirer le fruit de notre dur labeur.
