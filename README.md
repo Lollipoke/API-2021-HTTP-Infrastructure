@@ -111,3 +111,5 @@ docker-compose up -d nom_service pour lancer seulement nom_service
 
 port 8080 pris par traefic
 préfixe /api/ pris par traefic
+
+Ajout de middleware pour express_dynamic

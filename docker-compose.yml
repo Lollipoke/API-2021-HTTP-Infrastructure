@@ -16,26 +16,28 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   apache_static:
-    build: /docker-images/apache-php-image/.
+    build: ./docker-images/apache-php-image/.
     image: api/apache_php
     # Will launch 2 instances of this image
     deploy:
-      replicas: 1
+      replicas: 3
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.apache_static.rule=Host(`labo.api.ch`) && PathPrefix(`/`)"
-      - "traefik.http.services.ajax.loadbalancer.sticky=true"
-      - "traefik.http.services.apache_static.loadbalancer.sticky.cookie.name=session"
+    # Theses containers will be accessible from localhost:8282/ with stick
+    # session enabled
+     - "traefik.enable=true"
+     - "traefik.http.routers.apache.rule=PathPrefix(`/`) && Host(`labo.api.ch`)"
+     - "traefik.http.services.apache.loadbalancer.sticky=true"
+     - "traefik.http.services.apache.loadbalancer.sticky.cookie.name=StickyCookie"
 
   express_dynamic:
-    build: /docker-images/express-image/.
+    build: ./docker-images/express-image/.
     image: api/express_pets
     # Will launch 2 instances of this image
     deploy:
-      replicas: 1
+      replicas: 2
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.express_dynamic.rule=Host(`labo.api.ch`) && Path(`/pets/`)"
-      - "traefik.http.services.express_dynamic.loadbalancer.server.port=3000"
-      - "traefik.http.routers.express_dynamic.middlewares=express_dynamic-replacepath"
-      - "traefik.http.middlewares.express_dynamic-replacepath.replacepath.path=/"
+      - "traefik.http.services.express.loadbalancer.server.port=3000"
+      - "traefik.http.routers.express.rule=PathPrefix(`/pets/`) && Host(`labo.api.ch`)"
+      - "traefik.http.routers.express.middlewares=express-replacepath"
+      - "traefik.http.middlewares.express-replacepath.replacepath.path=/"
