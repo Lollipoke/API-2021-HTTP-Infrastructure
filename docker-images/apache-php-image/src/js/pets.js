@@ -3,7 +3,7 @@ $(function(){
 
 
    function loadPets() {
-      $.getJSON("/api/pets/", function( pets ) {
+      $.getJSON("/pets/", function( pets ) {
          console.log(pets);
             var message = "No pets here.";
             var color = "black";

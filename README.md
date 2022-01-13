@@ -89,3 +89,25 @@ Une fois cette étape réalisée, il a fallu à nouveau modifier le Dockerfile p
 
 Une fois que nous avons fait tout cela, nous pouvons tester notre infrastructure dans sa totalité. Pour cela nous pouvons lancer plusieurs container api/apache_php, dont un que nous nommons apache_static, puis plusieurs container api/express_pets, dont un que nous nommons express_dynamic. A l'aide de la commande docker inspect XXX | grep -i ipaddress, nous récupérons les addresses de nos deux containers nommés (remplacer XXX par apache_static et express_dynamic). Ensuite, nous pouvons lancer un container api/apache_rp en n'oubliant pas de préciser les variables d'environnement initialisées avec les addresses IP qu'on a récupérées l'instant d'avant ni de mapper le port 8080 au port 80.
 Finalement, étant donné que notre fichier Hosts contient toujours la configuration DNS pour l'Host labo.api.ch, on peut accéder directement à notre page web à l'adresse labo.api.ch:8080 et admirer le fruit de notre dur labeur.
+
+## 6. Traefik reverse proxy
+
+Nous avons souhaité ajouter du load balancing à notre reverse proxy, ainsi que la gestion de sticky sessions et d'un cluster dynamique. Pour cela, nous avons décidé d'utiliser un reverse proxy Traefic, qui permet de gérer ces trois fonctionnalités 
+
+Ajout d'un docker-compose.yml à la racine du projet, afin de décrire la structure des containers à créer. Docker compose permet de décrire plusieurs services faisant partie d'un même projet.
+
+Là où apache avait besoin d'un fichier de configuration contenant tous les chemins possibles vers nos serveurs (001-reverse-proxy.conf), Traefik lui récupère directement le bon serveur en allant récupérer l'information lui-même via les providers. Au moment de déployer les serveurs, on attache une information qui indique à Traefik les charactéristiques des requêtes que le serveur peut gérer. /api/pets pour le serveur dynamique et / pour le serveur statique dans notre projet. Ca permet d'ajouter/de supprimer des serveurs sans avoir à changer les fichiers de configuration, en temps réel, sans avoir à redémarrer quoi que ce soit. => dynamic cluster
+
+Pour lancer notre reverse-proxy Traefik avec docker compose, il suffit de run docker-compose up -d reverse-proxy (défini dans docker-compose.yml)
+Dans un docker-compose, chaque nouveau service correspond à un nouveau container qu'on peut créer avec un run docker-compose up -d nom_service
+
+Pour lancer plusieurs instances de services, utiliser docker-compose up -d --scale nom_service=n
+
+Comme nous utilisons Docker comme Provider, afin de communiquer à Traefik quelle configuration utiliser, nous devons utiliser des labels attachés à nos containers. Voir le docker-compose.yml. Ces labels transmettent l'information à Traefik, comme mentionné plus haut.
+
+docker-compose down pour tuer tous les containers d'un coup
+docker-compose up -d pour tous les lancer
+docker-compose up -d nom_service pour lancer seulement nom_service
+
+port 8080 pris par traefic
+préfixe /api/ pris par traefic
