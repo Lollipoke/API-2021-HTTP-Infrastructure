@@ -2,42 +2,38 @@ version: '3'
 
 services:
   reverse-proxy:
-    # The official v2 Traefik docker image
     image: traefik:v2.5
-    # Enables the web UI and tells Traefik to listen to docker
     command: --providers.docker --api.insecure=true
     ports:
-      # The HTTP port
       - "9090:80"
-      # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
     volumes:
-      # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
 
   apache_static:
     build: ./docker-images/apache-php-image/.
     image: api/apache_php
-    # Will launch 2 instances of this image
     deploy:
       replicas: 3
     labels:
-    # Theses containers will be accessible from localhost:8282/ with stick
-    # session enabled
-     - "traefik.enable=true"
      - "traefik.http.routers.apache.rule=PathPrefix(`/`) && Host(`labo.api.ch`)"
      - "traefik.http.services.apache.loadbalancer.sticky=true"
-     - "traefik.http.services.apache.loadbalancer.sticky.cookie.name=StickyCookie"
+     - "traefik.http.services.apache.loadbalancer.sticky.cookie.name=cookie"
 
   express_dynamic:
     build: ./docker-images/express-image/.
     image: api/express_pets
-    # Will launch 2 instances of this image
     deploy:
       replicas: 2
     labels:
-      - "traefik.enable=true"
       - "traefik.http.services.express.loadbalancer.server.port=3000"
       - "traefik.http.routers.express.rule=PathPrefix(`/pets/`) && Host(`labo.api.ch`)"
       - "traefik.http.routers.express.middlewares=express-replacepath"
       - "traefik.http.middlewares.express-replacepath.replacepath.path=/"
+
+  portainer:
+    image: portainer/portainer-ce
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
